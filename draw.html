@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #e0e0e0;
+        }
+
+        input {
+            padding: 8px;
+            font-size: 18px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        #drawButton {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .activeBtn {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .activeBtn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 123, 255, 0.7);
+        }
+
+        .disableBtn:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        #card {
+            margin-top: 30px;
+            width: 220px;
+            height: 330px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        #cardInner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            
+            transform-origin: center center;
+        }
+
+        .cardFace {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            
+            border-radius: 15px;
+        }
+
+        #cardFront {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            transform: rotateY(180deg);
+        }
+
+        #cardBack {
+            color: white;
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 200px;
+            background-size: cover;
+            border-radius: 15px;
+            backface-visibility: hidden;
+        }
+
+        .flipped {
+            transform: rotateY(180deg);
+            transition: transform 3s cubic-bezier(0.2, 0.5, 0.8, 1);
+        }
+
+        #result {
+            margin-top: 25px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #a11a1a;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        @-webkit-keyframes SSRSlide {
+            0% {
+                background-position: 0% 62%
+            }
+
+            50% {
+                background-position: 100% 39%
+            }
+
+            100% {
+                background-position: 0% 62%
+            }
+        }
+
+        @-moz-keyframes SSRSlide {
+            0% {
+                background-position: 0% 62%
+            }
+
+            50% {
+                background-position: 100% 39%
+            }
+
+            100% {
+                background-position: 0% 62%
+            }
+        }
+
+        @keyframes SSRSlide {
+            0% {
+                background-position: 0% 62%
+            }
+
+            50% {
+                background-position: 100% 39%
+            }
+
+            100% {
+                background-position: 0% 62%
+            }
+        }
+
+        .SSR {
+            background: linear-gradient(243deg, #9bb24e, #d48a50, #d066a5, #d0ba66, #7691d3, #383d7d);
+            background-size: 1200% 1200%;
+            color: rgb(255, 248, 248);
+            -webkit-animation: SSRSlide 5s ease infinite;
+            -moz-animation: SSRSlide 5s ease infinite;
+            animation: SSRSlide 5s ease infinite;
+        }
+
+        .SR {
+
+            background: linear-gradient(135deg, #f7b267, #f79d65, #f4845f, #f27052, #e94b3c);
+            color: silver;
+        }
+
+        .R {
+            background-color: #9ca3c7;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <label for="start">Start Number: </label>
+    <input type="number" oninput="this.value = Math.round(this.value);" id="start" required>
+    <label for="end">End Number: </label>
+    <input type="number" oninput="this.value = Math.round(this.value);" id="end" required>
+    <br>
+
+
+    <div id="card">
+        <div id="cardInner">
+            <div id="cardFront" class="cardFace"></div>
+            <div id="cardBack" class="cardFace">?</div>
+        </div>
+    </div>
+    <br>
+    <button id="drawButton" class="activeBtn">Draw</button>
+
+    <div id="result"></div>
+
+    <script>
+        var clicked = false;
+        document.getElementById('drawButton').addEventListener('click', function () {
+            let start = parseInt(document.getElementById('start').value);
+            let end = parseInt(document.getElementById('end').value);
+            let resultDiv = document.getElementById('result');
+            let cardFront = document.getElementById('cardFront');
+            let card = document.getElementById('cardInner');
+            let cardBack = document.getElementById('cardBack');
+            let btn = document.getElementById('drawButton');
+
+            if (isNaN(start) || isNaN(end) || end <= start) {
+
+                resultDiv.textContent = 'Please enter valid numbers. End number must be greater than start number.';
+                resultDiv.style.opacity = 1;
+                setTimeout(() => {
+                    resultDiv.style.opacity = 0;
+                }, 3000);
+                return;
+            }
+
+            let range = end - start + 1;
+            let draw = Math.floor(Math.random() * range) + start;
+            let rarity;
+
+            let top5 = Math.ceil(range * 0.05);
+            let top20 = Math.ceil(range * 0.2);
+
+            if (range < 10) {
+                rarity = "R";
+            } else if (draw <= start + top5 - 1) {
+                if(top5 == top20) {
+                    // range too small
+                    rarity = "SR";
+                }
+                else{
+                    rarity = "SSR";
+                }
+            } else if (draw <= start + top20 - 1) {
+                rarity = "SR";
+            } else {
+                rarity = "R";
+            }
+
+            // rotate back if clicked
+            if (clicked) {
+                card.classList.add('flipBack');
+            }
+
+            card.classList.remove('flipped');
+            cardFront.classList.remove('SSR', 'SR', 'R');
+            cardFront.textContent = "";
+
+            setTimeout(() => {
+                card.classList.add('flipped');
+                cardFront.classList.add(rarity);
+                cardFront.textContent = draw + " (" + rarity + ")";
+                btn.setAttribute('disabled', 'true');
+                btn.classList.remove('activeBtn');
+                btn.classList.add('disableBtn');
+            }, 20);
+        });
+    </script>
+</body>
+
+</html>
