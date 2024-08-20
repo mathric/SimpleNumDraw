@@ -58,7 +58,7 @@
             width: 100%;
             height: 100%;
             transform-style: preserve-3d;
-            
+
             transform-origin: center center;
         }
 
@@ -66,7 +66,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            
+
             border-radius: 15px;
         }
 
@@ -166,6 +166,22 @@
             background-color: #9ca3c7;
             color: black;
         }
+
+        .SSRBorder {
+            position: absolute;
+            display: flex;
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            top: -5px;
+            left: -5px;
+            background: linear-gradient(45deg, #d74747, #d48a50, #5a9765, #d0ba66, #7691d3, #383d7d);
+            background-size: 200%;
+            -webkit-animation: SSRSlide 5s ease infinite;
+            -moz-animation: SSRSlide 5s ease infinite;
+            animation: SSRSlide 5s ease infinite;
+            filter: brightness(1.5);
+            border-radius: 15px;
+        }
     </style>
 </head>
 
@@ -179,6 +195,7 @@
 
     <div id="card">
         <div id="cardInner">
+            <div id="cardBorder"></div>
             <div id="cardFront" class="cardFace"></div>
             <div id="cardBack" class="cardFace">?</div>
         </div>
@@ -198,6 +215,7 @@
             let card = document.getElementById('cardInner');
             let cardBack = document.getElementById('cardBack');
             let btn = document.getElementById('drawButton');
+            let cardBorder = document.getElementById('cardBorder');
 
             if (isNaN(start) || isNaN(end) || end <= start) {
 
@@ -219,22 +237,17 @@
             if (range < 10) {
                 rarity = "R";
             } else if (draw <= start + top5 - 1) {
-                if(top5 == top20) {
+                if (top5 == top20) {
                     // range too small
                     rarity = "SR";
                 }
-                else{
+                else {
                     rarity = "SSR";
                 }
             } else if (draw <= start + top20 - 1) {
                 rarity = "SR";
             } else {
                 rarity = "R";
-            }
-
-            // rotate back if clicked
-            if (clicked) {
-                card.classList.add('flipBack');
             }
 
             card.classList.remove('flipped');
@@ -244,6 +257,9 @@
             setTimeout(() => {
                 card.classList.add('flipped');
                 cardFront.classList.add(rarity);
+                if(rarity == "SSR") {
+                    cardBorder.classList.add('SSRBorder');
+                }
                 cardFront.textContent = draw + " (" + rarity + ")";
                 btn.setAttribute('disabled', 'true');
                 btn.classList.remove('activeBtn');
